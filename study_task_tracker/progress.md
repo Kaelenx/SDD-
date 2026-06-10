@@ -77,6 +77,41 @@
   - `tests/test_service.py`
   - `tests/test_api.py`
 
+### Phase 7: Complexity Upgrade
+- **Status:** complete
+- Actions taken:
+  - Added notes and estimated hours to tasks.
+  - Added course statistics, bulk completion, and export APIs.
+  - Added frontend course statistics panel, bulk selection bar, remaining-hour summary, and export button.
+  - Added tests for estimated-hour validation, course stats, bulk completion, and export.
+  - Fixed stale selection count after bulk completion under an empty filtered list.
+- Files created/modified:
+  - `src/study_tracker/models.py`
+  - `src/study_tracker/service.py`
+  - `src/study_tracker/server.py`
+  - `frontend/index.html`
+  - `frontend/styles.css`
+  - `frontend/app.js`
+  - `tests/test_service.py`
+  - `tests/test_api.py`
+
+### Phase 8: Engineering Structure Upgrade
+- **Status:** complete
+- Actions taken:
+  - Split backend into `domain`, `application`, `infrastructure`, and `web` packages.
+  - Kept old `models.py`, `service.py`, `store.py`, and `server.py` as compatibility wrappers.
+  - Split frontend JavaScript into native ES modules under `frontend/app/`.
+  - Verified `python -m study_tracker.server` still starts the app.
+  - Verified browser module loading and task creation after refactor.
+- Files created/modified:
+  - `src/study_tracker/domain/task.py`
+  - `src/study_tracker/application/task_service.py`
+  - `src/study_tracker/infrastructure/json_repository.py`
+  - `src/study_tracker/web/http_server.py`
+  - `src/study_tracker/web/serializers.py`
+  - `frontend/app/*.js`
+  - `frontend/index.html`
+
 ## Test Results
 | Test | Input | Expected | Actual | Status |
 |------|-------|----------|--------|--------|
@@ -89,6 +124,13 @@
 | Feature upgrade unit tests | `python -m unittest discover -s tests` | All tests pass | 29 tests passed | Pass |
 | Feature upgrade coverage | `python tools/coverage_report.py` | Coverage output and successful exit | Total coverage 85.3% | Pass |
 | Browser search/filter/edit | Browser flow | Search, high-priority filter, edit save, complete | Passed; progress showed 50% | Pass |
+| Complexity unit tests | `python -m unittest discover -s tests` | All tests pass | 35 tests passed | Pass |
+| Complexity coverage | `python tools/coverage_report.py` | Coverage output and successful exit | Total coverage 85.8% | Pass |
+| Browser bulk/course flow | Browser flow | Notes, hours, course stats, bulk complete | Passed; completion rate 100% | Pass |
+| Engineering unit tests | `python -m unittest discover -s tests` | All tests pass | 35 tests passed | Pass |
+| Engineering coverage | `python tools/coverage_report.py` | Coverage output and successful exit | Total coverage 86.4% | Pass |
+| Browser module load | Browser check | ES modules load and UI renders | Passed; module script detected | Pass |
+| Browser post-refactor add | Browser flow | Add task after refactor | Passed; summary and course stats refreshed | Pass |
 
 ## Error Log
 | Timestamp | Error | Attempt | Resolution |
@@ -98,6 +140,7 @@
 | 2026-06-10 | Coverage initially missed API code running in server thread | 2 | Added `threading.settrace` in coverage runner |
 | 2026-06-10 | Port 8000 failed with WinError 10013 | 1 | Changed default and documentation to port 8765 |
 | 2026-06-10 | Coverage script timed out after feature upgrade due per-line path resolution | 2 | Added normalized filename cache and string path matching |
+| 2026-06-10 | Bulk completion left stale selection count on empty filtered list | 1 | Refresh selection bar in empty render branch |
 
 ## 5-Question Reboot Check
 | Question | Answer |
@@ -106,4 +149,4 @@
 | Where am I going? | Ready for handoff |
 | What's the goal? | Deliver a complete frontend-backend SDD project |
 | What have I learned? | See findings.md |
-| What have I done? | Completed feature upgrade, tests, coverage, browser verification, and docs |
+| What have I done? | Completed engineering structure upgrade, tests, coverage, browser verification, and docs |

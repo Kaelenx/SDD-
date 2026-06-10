@@ -8,6 +8,10 @@
 - 按状态和优先级筛选
 - 按标题、课程或任务 ID 搜索
 - 展示全部、待完成、已完成、逾期数量和完成率进度条
+- 记录任务备注和预计小时
+- 按课程统计任务数量、逾期和剩余小时
+- 勾选多条任务批量完成
+- 导出任务、摘要和课程统计 JSON
 
 ## 快速运行
 
@@ -39,8 +43,13 @@ python tools/coverage_report.py
 | `spec.md` | 需求规格，包含业务边界和异常边界 |
 | `plan.md` | 技术定义，包含前后端架构、API、依赖、测试策略 |
 | `tasks.md` | 任务拆分与最终代码一致性记录 |
-| `frontend/` | 前端页面、样式和交互逻辑 |
-| `src/` | 后端源码、服务层、领域层、存储层 |
+| `frontend/` | 前端页面、样式和 ES module 交互逻辑 |
+| `frontend/app/` | 前端 API、状态、表单、渲染和入口模块 |
+| `src/study_tracker/domain/` | 领域实体、校验规则和异常 |
+| `src/study_tracker/application/` | 业务用例服务 |
+| `src/study_tracker/infrastructure/` | JSON 存储适配器 |
+| `src/study_tracker/web/` | HTTP 路由、静态资源服务和序列化 |
+| `src/study_tracker/server.py` | 保持 `python -m study_tracker.server` 可运行的入口 |
 | `tests/` | 单元测试和 API 测试 |
 | `tools/coverage_report.py` | 覆盖率统计脚本 |
 | `self_test_report.md` | 自测调试报告 |

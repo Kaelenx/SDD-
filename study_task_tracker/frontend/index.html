@@ -39,6 +39,10 @@
             <span id="summary-overdue">0</span>
             <small>逾期</small>
           </div>
+          <div class="summary-item">
+            <span id="summary-hours">0</span>
+            <small>剩余小时</small>
+          </div>
         </div>
       </section>
 
@@ -57,10 +61,18 @@
             <span>课程/主题</span>
             <input id="course" name="course" maxlength="40" placeholder="软件工程" />
           </label>
+          <label>
+            <span>任务备注</span>
+            <textarea id="notes" name="notes" maxlength="240" rows="4" placeholder="补充验收点、资料链接或注意事项"></textarea>
+          </label>
           <div class="form-row">
             <label>
               <span>截止日期</span>
               <input id="due-date" name="dueDate" type="date" required />
+            </label>
+            <label>
+              <span>预计小时</span>
+              <input id="estimated-hours" name="estimatedHours" type="number" min="0.25" max="40" step="0.25" value="1" required />
             </label>
             <label>
               <span>优先级</span>
@@ -74,6 +86,14 @@
           <button id="submit-button" type="submit" class="primary-button">新增任务</button>
           <p id="form-message" class="message" role="status"></p>
         </form>
+
+        <section class="panel course-panel">
+          <div class="course-panel-header">
+            <h2>课程统计</h2>
+            <button id="export-button" type="button" class="text-button">导出 JSON</button>
+          </div>
+          <div id="course-stats" class="course-list"></div>
+        </section>
 
         <section class="panel task-panel">
           <div class="task-header">
@@ -99,10 +119,14 @@
               </div>
             </div>
           </div>
+          <div class="bulk-bar">
+            <span id="selection-count">已选择 0 项</span>
+            <button id="bulk-complete" type="button" class="task-action" disabled>完成所选</button>
+          </div>
           <div id="task-list" class="task-list" aria-live="polite"></div>
         </section>
       </section>
     </main>
-    <script src="/app.js"></script>
+    <script type="module" src="/app/main.js"></script>
   </body>
 </html>

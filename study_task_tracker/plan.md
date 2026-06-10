@@ -25,14 +25,30 @@ study_task_tracker/
   frontend/
     index.html
     styles.css
-    app.js
+    app/
+      api.js
+      dom.js
+      form.js
+      format.js
+      main.js
+      render.js
+      state.js
   src/
     study_tracker/
       __init__.py
-      models.py
-      store.py
-      service.py
-      server.py
+      models.py                  # compatibility wrapper
+      store.py                   # compatibility wrapper
+      service.py                 # compatibility wrapper
+      server.py                  # runnable entry point
+      domain/
+        task.py
+      application/
+        task_service.py
+      infrastructure/
+        json_repository.py
+      web/
+        http_server.py
+        serializers.py
   tests/
     test_api.py
     test_service.py
@@ -49,18 +65,24 @@ study_task_tracker/
 |----|------|------|
 | 前端页面 | `frontend/index.html` | 页面结构、表单、任务列表 |
 | 前端样式 | `frontend/styles.css` | 响应式布局、表单、任务卡片、摘要区样式 |
-| 前端逻辑 | `frontend/app.js` | 调用 REST API、渲染列表、处理筛选、编辑和按钮交互 |
-| HTTP/API 层 | `src/study_tracker/server.py` | 静态资源服务、REST 路由、JSON 请求响应 |
-| 服务层 | `src/study_tracker/service.py` | 新增、查询、完成、删除、摘要 |
-| 领域层 | `src/study_tracker/models.py` | 任务实体、校验规则、领域异常 |
-| 存储层 | `src/study_tracker/store.py` | JSON 文件读写 |
+| 前端入口 | `frontend/app/main.js` | 组装 API、渲染、表单和事件监听 |
+| 前端 API | `frontend/app/api.js` | 封装 fetch 和 JSON 导出 |
+| 前端状态 | `frontend/app/state.js` | 管理筛选、编辑、选择状态 |
+| 前端渲染 | `frontend/app/render.js` | 渲染任务卡片、课程统计、摘要和选择栏 |
+| 前端表单 | `frontend/app/form.js` | 新增/编辑表单状态和 payload 生成 |
+| HTTP/API 层 | `src/study_tracker/web/http_server.py` | 静态资源服务、REST 路由、JSON 请求响应 |
+| 序列化层 | `src/study_tracker/web/serializers.py` | 将应用层对象转换为 JSON 响应 |
+| 应用层 | `src/study_tracker/application/task_service.py` | 新增、查询、编辑、批量完成、删除、摘要、课程统计 |
+| 领域层 | `src/study_tracker/domain/task.py` | 任务实体、校验规则、领域异常 |
+| 基础设施层 | `src/study_tracker/infrastructure/json_repository.py` | JSON 文件读写 |
+| 兼容入口 | `src/study_tracker/server.py` 等 | 保留旧运行和导入方式 |
 
 调用方向：
 
 ```text
-Browser UI -> fetch('/api/...') -> server.py -> StudyTaskService -> JsonTaskRepository -> JSON file
-                                      |
-                                      -> frontend static files
+Browser UI -> frontend/app modules -> fetch('/api/...')
+    -> web/http_server.py -> application/task_service.py
+    -> domain/task.py + infrastructure/json_repository.py -> JSON file
 ```
 
 ## 4. API 设计
@@ -107,6 +129,24 @@ Browser UI -> fetch('/api/...') -> server.py -> StudyTaskService -> JsonTaskRepo
 }
 ```
 
+### GET `/api/courses`
+
+返回课程维度统计，用于前端课程统计面板。
+
+### PATCH `/api/tasks/bulk-complete`
+
+请求体：
+
+```json
+{
+  "task_ids": ["T0001", "T0002"]
+}
+```
+
+### GET `/api/export`
+
+返回 `summary`、`courses`、`tasks`，前端可下载为 JSON 文件。
+
 ## 5. 数据存储设计
 
 默认数据文件为 `data/tasks.json`，运行时也可通过 `--data-file` 指定。
@@ -132,18 +172,21 @@ Browser UI -> fetch('/api/...') -> server.py -> StudyTaskService -> JsonTaskRepo
 |------|------|
 | 摘要区 | 展示全部、待完成、已完成、逾期数量 |
 | 进度条 | 根据 done/total 展示完成率 |
-| 新增任务表单 | 输入标题、课程、日期、优先级后提交 |
+| 新增任务表单 | 输入标题、课程、备注、日期、预计小时、优先级后提交 |
 | 编辑模式 | 点击编辑后复用表单保存任务修改，可取消编辑 |
 | 筛选工具栏 | 支持搜索、优先级筛选、状态筛选 |
-| 任务卡片 | 展示任务信息，支持编辑、完成和删除 |
+| 课程统计 | 展示每门课程的任务数量、完成状态、逾期和剩余小时 |
+| 批量操作 | 勾选多条任务后可一次性完成 |
+| 任务卡片 | 展示任务信息、预计小时和备注，支持编辑、完成和删除 |
+| 导出 | 下载任务、摘要和课程统计 JSON |
 | 消息区 | 显示新增、完成、删除或错误提示 |
 
 ## 7. 测试策略
 
 | 测试类型 | 覆盖内容 |
 |----------|----------|
-| API 测试 | 健康检查、静态页面、创建、列表、搜索筛选、编辑、完成、删除、非法输入 |
-| 服务层测试 | 业务校验、ID 生成、搜索筛选、编辑、状态流转、摘要 |
+| API 测试 | 健康检查、静态页面、创建、列表、搜索筛选、编辑、批量完成、课程统计、导出、删除、非法输入 |
+| 服务层测试 | 业务校验、ID 生成、搜索筛选、编辑、状态流转、课程统计、摘要 |
 | 存储层测试 | 文件不存在、空文件、正常读写、非法 JSON、非法任务结构 |
 | 覆盖率脚本 | 统计 `src/study_tracker` 下源码行覆盖率 |
 | 浏览器冒烟测试 | 打开页面、提交任务、完成任务、查看摘要 |

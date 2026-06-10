@@ -11,6 +11,8 @@
 | T-07 | 实现前端页面、样式和交互，包含搜索、筛选、编辑和完成进度 | `frontend/index.html`、`frontend/styles.css`、`frontend/app.js` | 浏览器冒烟测试 | Done |
 | T-08 | 实现单元测试和覆盖率脚本 | `tests/`、`tools/coverage_report.py` | `python -m unittest discover -s tests`、`python tools/coverage_report.py` | Done |
 | T-09 | 完成自测、根因分析和交付检查 | `self_test_report.md`、`root_cause_analysis.md` | 自测报告 | Done |
+| T-10 | 增加备注、预计小时、课程统计、批量完成和导出功能 | `src/study_tracker/`、`frontend/`、`tests/` | 35 个测试、覆盖率、浏览器验证 | Done |
+| T-11 | 前后端工程化重构，拆分后端分层包和前端 ES modules | `src/study_tracker/domain/`、`application/`、`infrastructure/`、`web/`、`frontend/app/` | 35 个测试、覆盖率、浏览器验证 | Done |
 
 ## 一致性规则
 

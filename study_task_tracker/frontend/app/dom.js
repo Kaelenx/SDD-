@@ -1,0 +1,32 @@
+export const refs = {
+  taskList: document.querySelector("#task-list"),
+  form: document.querySelector("#task-form"),
+  message: document.querySelector("#form-message"),
+  filters: document.querySelectorAll(".filter"),
+  searchInput: document.querySelector("#search"),
+  priorityFilter: document.querySelector("#priority-filter"),
+  courseStats: document.querySelector("#course-stats"),
+  bulkCompleteButton: document.querySelector("#bulk-complete"),
+  selectionCount: document.querySelector("#selection-count"),
+  exportButton: document.querySelector("#export-button"),
+  formTitle: document.querySelector("#form-title"),
+  editingIdInput: document.querySelector("#editing-id"),
+  submitButton: document.querySelector("#submit-button"),
+  cancelEditButton: document.querySelector("#cancel-edit"),
+  completionRate: document.querySelector("#completion-rate"),
+  completionBar: document.querySelector("#completion-bar"),
+  summaryTotal: document.querySelector("#summary-total"),
+  summaryPending: document.querySelector("#summary-pending"),
+  summaryDone: document.querySelector("#summary-done"),
+  summaryOverdue: document.querySelector("#summary-overdue"),
+  summaryHours: document.querySelector("#summary-hours"),
+};
+
+export const fields = {
+  title: document.querySelector("#title"),
+  course: document.querySelector("#course"),
+  notes: document.querySelector("#notes"),
+  dueDate: document.querySelector("#due-date"),
+  estimatedHours: document.querySelector("#estimated-hours"),
+  priority: document.querySelector("#priority"),
+};

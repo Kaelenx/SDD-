@@ -47,6 +47,22 @@ Complete
 - [x] Update final report
 - **Status:** complete
 
+### Phase 7: Complexity Upgrade
+- [x] Add notes and estimated hours to the task model
+- [x] Add course statistics, bulk completion, and export APIs
+- [x] Add frontend course panel, bulk selection, and export action
+- [x] Expand tests and coverage
+- [x] Verify in browser
+- **Status:** complete
+
+### Phase 8: Engineering Structure Upgrade
+- [x] Split backend into domain/application/infrastructure/web packages
+- [x] Keep compatibility wrappers and `python -m study_tracker.server`
+- [x] Split frontend into ES modules for API, state, form, render, and entrypoint
+- [x] Run tests and coverage
+- [x] Verify module loading and core interaction in browser
+- **Status:** complete
+
 ## Key Questions
 1. What frontend-backend project is small enough to finish while showing full SDD lifecycle?
    - A study task tracker web app is appropriate: clear CRUD behavior, API boundary, persistence, and testable errors.
@@ -64,6 +80,9 @@ Complete
 | Serve frontend and API from the same local server | Simplifies local running and avoids CORS issues |
 | Keep JSON persistence | Sufficient for a small single-user project |
 | Add edit/search/priority/progress features | Makes the project more convincingly frontend-backend without adding external dependencies |
+| Add course stats, notes, estimated hours, bulk completion, and export | Raises business complexity while staying within a small reviewable project |
+| Keep compatibility wrappers after backend refactor | Improves structure without breaking tests, run commands, or reviewer expectations |
+| Use native ES modules for frontend engineering | Adds maintainable frontend organization without introducing a build step |
 
 ## Errors Encountered
 | Error | Attempt | Resolution |
@@ -71,6 +90,7 @@ Complete
 | Initial delivery was CLI-style rather than frontend-backend | 1 | Converted project to REST backend plus static frontend |
 | First coverage script design was too slow | 1 | Replaced broad tracing with source-only `sys.settrace` |
 | Coverage timed out after feature upgrade | 2 | Cached normalized filenames and used string path matching |
+| Bulk completion left stale selection count on empty filtered list | 1 | Updated empty-list render branch to refresh selection state |
 
 ## Notes
 - Assignment requires `spec.md`, `plan.md`, tasks, code, unit tests, and normal run verification in one root folder.

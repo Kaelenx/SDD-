@@ -28,6 +28,8 @@ class StudyTaskServiceTest(unittest.TestCase):
             due_date="2026-06-12",
             course=" 软件工程 ",
             priority="HIGH",
+            notes="  覆盖核心逻辑  ",
+            estimated_hours="2.5",
         )
 
         self.assertEqual(task.id, "T0001")
@@ -35,6 +37,8 @@ class StudyTaskServiceTest(unittest.TestCase):
         self.assertEqual(task.course, "软件工程")
         self.assertEqual(task.priority, "high")
         self.assertEqual(task.status, "pending")
+        self.assertEqual(task.notes, "覆盖核心逻辑")
+        self.assertEqual(task.estimated_hours, 2.5)
 
         loaded = self.service.list_tasks()
         self.assertEqual([item.id for item in loaded], ["T0001"])
@@ -60,6 +64,10 @@ class StudyTaskServiceTest(unittest.TestCase):
     def test_add_task_rejects_invalid_priority(self):
         with self.assertRaises(ValidationError):
             self.service.add_task("任务", due_date="2026-06-12", priority="urgent")
+
+    def test_add_task_rejects_invalid_estimated_hours(self):
+        with self.assertRaises(ValidationError):
+            self.service.add_task("任务", due_date="2026-06-12", estimated_hours=80)
 
     def test_list_tasks_filters_by_status_and_sorts_by_due_date(self):
         later = self.service.add_task("后交", due_date="2026-06-14", priority="low")
@@ -89,6 +97,8 @@ class StudyTaskServiceTest(unittest.TestCase):
             due_date="2026-06-20",
             course="新课程",
             priority="high",
+            notes="新备注",
+            estimated_hours=3,
         )
 
         self.assertEqual(updated.title, "新标题")
@@ -97,6 +107,8 @@ class StudyTaskServiceTest(unittest.TestCase):
         self.assertEqual(updated.priority, "high")
         self.assertEqual(updated.status, "done")
         self.assertEqual(updated.completed_at, "2026-06-10")
+        self.assertEqual(updated.notes, "新备注")
+        self.assertEqual(updated.estimated_hours, 3)
 
     def test_update_missing_task_raises(self):
         with self.assertRaises(TaskNotFoundError):
@@ -110,6 +122,15 @@ class StudyTaskServiceTest(unittest.TestCase):
         self.assertEqual(completed.status, "done")
         self.assertEqual(completed.completed_at, "2026-06-10")
         self.assertEqual(self.service.summary().done, 1)
+
+    def test_complete_tasks_marks_multiple_tasks_done(self):
+        first = self.service.add_task("任务一", due_date="2026-06-12")
+        second = self.service.add_task("任务二", due_date="2026-06-13")
+
+        completed = self.service.complete_tasks([first.id, second.id])
+
+        self.assertEqual([task.status for task in completed], ["done", "done"])
+        self.assertEqual(self.service.summary().done, 2)
 
     def test_complete_missing_task_raises(self):
         with self.assertRaises(TaskNotFoundError):
@@ -128,9 +149,9 @@ class StudyTaskServiceTest(unittest.TestCase):
             self.service.delete_task("T9999")
 
     def test_summary_counts_pending_done_and_overdue(self):
-        overdue = self.service.add_task("逾期任务", due_date="2026-06-09")
-        self.service.add_task("未完成任务", due_date="2026-06-11")
-        done = self.service.add_task("已完成任务", due_date="2026-06-09")
+        overdue = self.service.add_task("逾期任务", due_date="2026-06-09", estimated_hours=2)
+        self.service.add_task("未完成任务", due_date="2026-06-11", estimated_hours=3)
+        done = self.service.add_task("已完成任务", due_date="2026-06-09", estimated_hours=5)
         self.service.complete_task(done.id)
 
         summary = self.service.summary()
@@ -139,7 +160,25 @@ class StudyTaskServiceTest(unittest.TestCase):
         self.assertEqual(summary.pending, 2)
         self.assertEqual(summary.done, 1)
         self.assertEqual(summary.overdue, 1)
+        self.assertEqual(summary.completion_rate, 33)
+        self.assertEqual(summary.total_estimated_hours, 10)
+        self.assertEqual(summary.remaining_estimated_hours, 5)
         self.assertEqual(overdue.status, "pending")
+
+    def test_course_summaries_group_tasks_by_course(self):
+        self.service.add_task("软件任务一", due_date="2026-06-09", course="软件工程", estimated_hours=2)
+        done = self.service.add_task("软件任务二", due_date="2026-06-12", course="软件工程", estimated_hours=4)
+        self.service.add_task("英语任务", due_date="2026-06-12", course="英语", estimated_hours=3)
+        self.service.complete_task(done.id)
+
+        summaries = self.service.course_summaries()
+
+        software = next(item for item in summaries if item.course == "软件工程")
+        self.assertEqual(software.total, 2)
+        self.assertEqual(software.pending, 1)
+        self.assertEqual(software.done, 1)
+        self.assertEqual(software.overdue, 1)
+        self.assertEqual(software.remaining_estimated_hours, 2)
 
 
 if __name__ == "__main__":

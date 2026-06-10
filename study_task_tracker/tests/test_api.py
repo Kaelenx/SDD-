@@ -67,6 +67,8 @@ class ApiTest(unittest.TestCase):
                 "course": "软件工程",
                 "due_date": "2026-06-12",
                 "priority": "high",
+                "notes": "接口联调",
+                "estimated_hours": 2.5,
             },
         )
         list_status, tasks = self.request_json("GET", "/api/tasks")
@@ -76,6 +78,8 @@ class ApiTest(unittest.TestCase):
 
         self.assertEqual(created_status, 201)
         self.assertEqual(task["id"], "T0001")
+        self.assertEqual(task["notes"], "接口联调")
+        self.assertEqual(task["estimated_hours"], 2.5)
         self.assertEqual(list_status, 200)
         self.assertEqual(len(tasks), 1)
         self.assertEqual(complete_status, 200)
@@ -123,6 +127,8 @@ class ApiTest(unittest.TestCase):
                 "course": "软件工程",
                 "due_date": "2026-06-20",
                 "priority": "high",
+                "notes": "补充说明",
+                "estimated_hours": 4,
             },
         )
 
@@ -131,6 +137,52 @@ class ApiTest(unittest.TestCase):
         self.assertEqual(updated["course"], "软件工程")
         self.assertEqual(updated["due_date"], "2026-06-20")
         self.assertEqual(updated["priority"], "high")
+        self.assertEqual(updated["notes"], "补充说明")
+        self.assertEqual(updated["estimated_hours"], 4)
+
+    def test_course_stats_endpoint(self):
+        self.request_json(
+            "POST",
+            "/api/tasks",
+            {"title": "软件任务", "course": "软件工程", "due_date": "2026-06-09", "estimated_hours": 2},
+        )
+        _, english = self.request_json(
+            "POST",
+            "/api/tasks",
+            {"title": "英语任务", "course": "英语", "due_date": "2026-06-12", "estimated_hours": 3},
+        )
+        self.request_json("PATCH", f"/api/tasks/{english['id']}/complete")
+
+        status, courses = self.request_json("GET", "/api/courses")
+
+        self.assertEqual(status, 200)
+        software = next(item for item in courses if item["course"] == "软件工程")
+        self.assertEqual(software["pending"], 1)
+        self.assertEqual(software["overdue"], 1)
+        self.assertEqual(software["remaining_estimated_hours"], 2)
+
+    def test_bulk_complete_endpoint(self):
+        _, first = self.request_json("POST", "/api/tasks", {"title": "任务一", "due_date": "2026-06-12"})
+        _, second = self.request_json("POST", "/api/tasks", {"title": "任务二", "due_date": "2026-06-13"})
+
+        status, completed = self.request_json(
+            "PATCH",
+            "/api/tasks/bulk-complete",
+            {"task_ids": [first["id"], second["id"]]},
+        )
+
+        self.assertEqual(status, 200)
+        self.assertEqual([task["status"] for task in completed], ["done", "done"])
+
+    def test_export_endpoint_returns_tasks_summary_and_courses(self):
+        self.request_json("POST", "/api/tasks", {"title": "导出任务", "course": "软件工程", "due_date": "2026-06-12"})
+
+        status, payload = self.request_json("GET", "/api/export")
+
+        self.assertEqual(status, 200)
+        self.assertIn("summary", payload)
+        self.assertIn("courses", payload)
+        self.assertEqual(payload["tasks"][0]["title"], "导出任务")
 
     def test_invalid_update_returns_bad_request(self):
         _, task = self.request_json("POST", "/api/tasks", {"title": "任务", "due_date": "2026-06-12"})

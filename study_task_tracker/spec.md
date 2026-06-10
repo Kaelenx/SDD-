@@ -30,9 +30,13 @@
 | FR-07 | 删除任务 | 点击删除按钮后，后端删除任务，页面刷新 |
 | FR-08 | 摘要统计 | 页面展示 total、pending、done、overdue 四项统计 |
 | FR-09 | 完成进度 | 页面根据 done/total 展示完成率和进度条 |
-| FR-10 | REST API | 后端提供任务 CRUD 相关 API，并返回 JSON |
-| FR-11 | 数据持久化 | 任务数据保存在本地 JSON 文件，服务重启后可读取 |
-| FR-12 | 静态资源服务 | 后端可直接服务 `frontend/` 下的 HTML、CSS、JS |
+| FR-10 | 任务备注与预计耗时 | 新增/编辑任务时可填写备注和预计小时，列表中展示 |
+| FR-11 | 课程统计 | 按课程展示总数、待完成、已完成、逾期和剩余小时 |
+| FR-12 | 批量完成 | 可勾选多条任务并一次性标记完成 |
+| FR-13 | 数据导出 | 可导出任务、摘要和课程统计 JSON |
+| FR-14 | REST API | 后端提供任务 CRUD、批量、统计、导出相关 API，并返回 JSON |
+| FR-15 | 数据持久化 | 任务数据保存在本地 JSON 文件，服务重启后可读取 |
+| FR-16 | 静态资源服务 | 后端可直接服务 `frontend/` 下的 HTML、CSS、JS |
 
 ## 4. API 需求
 
@@ -43,8 +47,11 @@
 | POST | `/api/tasks` | 新增任务 |
 | PATCH | `/api/tasks/{id}` | 编辑任务 |
 | PATCH | `/api/tasks/{id}/complete` | 标记任务完成 |
+| PATCH | `/api/tasks/bulk-complete` | 批量完成任务 |
 | DELETE | `/api/tasks/{id}` | 删除任务 |
 | GET | `/api/summary` | 获取摘要统计 |
+| GET | `/api/courses` | 获取课程维度统计 |
+| GET | `/api/export` | 导出任务、摘要和课程统计 |
 
 ## 5. 数据定义
 
@@ -58,6 +65,8 @@
 | status | str | 状态 | pending 或 done |
 | created_at | str | 创建日期 | YYYY-MM-DD |
 | completed_at | str/null | 完成日期 | 未完成时为 null |
+| notes | str | 任务备注 | 可选，最长 240 字符 |
+| estimated_hours | number | 预计耗时 | 0.25 到 40 小时 |
 
 ## 6. 业务边界
 
@@ -83,7 +92,9 @@
 | 课程名超过 40 字符 | 后端返回 400 JSON 错误 | `test_add_task_rejects_long_course` |
 | 截止日期格式错误 | 后端返回 400 JSON 错误 | `test_add_task_rejects_invalid_due_date` |
 | 优先级非法 | 后端返回 400 JSON 错误 | `test_add_task_rejects_invalid_priority` |
+| 预计小时非法 | 后端返回 400 JSON 错误 | `test_add_task_rejects_invalid_estimated_hours` |
 | 编辑任务输入非法 | 后端返回 400 JSON 错误 | `test_invalid_update_returns_bad_request` |
+| 批量完成未提供 ID | 后端返回 400 JSON 错误 | `complete_tasks` 校验 |
 | 完成不存在任务 | 服务层抛出 TaskNotFoundError，API 返回 400 | `test_complete_missing_task_raises` |
 | 删除不存在任务 | 服务层抛出 TaskNotFoundError，API 返回 400 | `test_delete_missing_task_raises` |
 | 请求体不是合法 JSON | API 返回 400 JSON 错误 | `server.py` 中 `_read_json_body` |

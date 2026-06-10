@@ -17,6 +17,8 @@
 - Python standard library can provide a small REST/static server through `http.server`.
 - Final verification after feature upgrade: 29 tests passed; source coverage is 85.3%; browser add/search/filter/edit/complete flow passed on `http://127.0.0.1:8765`.
 - Feature upgrade added task editing, keyword search, priority filtering, and completion progress while keeping the no-dependency architecture.
+- Complexity upgrade added task notes, estimated hours, course statistics, bulk completion, and export.
+- Engineering upgrade split backend into domain/application/infrastructure/web and split frontend into native ES modules.
 
 ## Technical Decisions
 | Decision | Rationale |
@@ -28,6 +30,9 @@
 | Storage: JSON file | Simple persistent storage for a small project |
 | Tests: `unittest` + API server tests | Standard library and verifies backend contract |
 | Edit/search/filter features | Adds useful complexity while keeping the code reviewable |
+| Course stats and batch operations | Demonstrates richer backend aggregation and frontend state management |
+| Backend compatibility wrappers | Preserve reviewer-facing commands while improving internal structure |
+| Native frontend modules | Improve maintainability without adding Node or build dependencies |
 
 ## Issues Encountered
 | Issue | Resolution |
@@ -48,3 +53,5 @@
 - Browser console error log was empty.
 - After cleanup and reload, page showed empty state and all summary counts were 0.
 - After feature upgrade, browser verified keyword search, high-priority filtering, edit-save flow, task completion, and 50% completion progress.
+- Complexity verification covered notes, estimated hours, course statistics, bulk completion, stale selection fix, and no browser console errors.
+- Engineering verification confirmed module loading, task creation, summary refresh, course refresh, and no browser console errors.

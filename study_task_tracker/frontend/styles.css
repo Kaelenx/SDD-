@@ -19,6 +19,7 @@ body {
 
 button,
 input,
+textarea,
 select {
   font: inherit;
 }
@@ -161,6 +162,7 @@ label span {
 }
 
 input,
+textarea,
 select {
   width: 100%;
   min-height: 42px;
@@ -172,15 +174,21 @@ select {
 }
 
 input:focus,
+textarea:focus,
 select:focus,
 button:focus-visible {
   outline: 3px solid rgba(50, 109, 230, 0.2);
   border-color: #326de6;
 }
 
+textarea {
+  min-height: 96px;
+  resize: vertical;
+}
+
 .form-row {
   display: grid;
-  grid-template-columns: 1fr 120px;
+  grid-template-columns: 1fr 110px 96px;
   gap: 12px;
 }
 
@@ -230,6 +238,45 @@ button:focus-visible {
 .task-panel {
   min-height: 520px;
   padding: 18px;
+  grid-column: 2;
+  grid-row: 1 / span 2;
+}
+
+.course-panel {
+  display: grid;
+  gap: 12px;
+  padding: 18px;
+  align-self: start;
+}
+
+.course-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.course-list {
+  display: grid;
+  gap: 8px;
+}
+
+.course-row {
+  display: grid;
+  gap: 6px;
+  padding: 10px;
+  border: 1px solid #d8e0ea;
+  border-radius: 8px;
+  background: #f8fafc;
+}
+
+.course-row strong {
+  font-size: 14px;
+}
+
+.course-row span {
+  color: #5d6b7c;
+  font-size: 12px;
 }
 
 .task-header {
@@ -266,6 +313,25 @@ button:focus-visible {
   background: #f5f7fa;
 }
 
+.bulk-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+  padding: 10px 12px;
+  border: 1px solid #d8e0ea;
+  border-radius: 8px;
+  background: #f8fafc;
+  color: #5d6b7c;
+  font-size: 13px;
+}
+
+.bulk-bar button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
 .filter {
   min-width: 72px;
   border-color: transparent;
@@ -294,12 +360,19 @@ button:focus-visible {
 
 .task-card {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-columns: auto minmax(0, 1fr) auto;
   gap: 14px;
   padding: 14px;
   border: 1px solid #d8e0ea;
   border-radius: 8px;
   background: #ffffff;
+}
+
+.select-task {
+  width: 18px;
+  height: 18px;
+  min-height: 0;
+  margin-top: 4px;
 }
 
 .task-card.done {
@@ -327,6 +400,13 @@ button:focus-visible {
   gap: 8px;
   color: #5d6b7c;
   font-size: 13px;
+}
+
+.task-notes {
+  margin: 10px 0 0;
+  color: #3b4656;
+  font-size: 13px;
+  line-height: 1.5;
 }
 
 .pill {
@@ -374,11 +454,17 @@ button:focus-visible {
     grid-template-columns: 1fr;
   }
 
+  .task-panel {
+    grid-column: auto;
+    grid-row: auto;
+  }
+
   .task-card {
-    grid-template-columns: 1fr;
+    grid-template-columns: auto 1fr;
   }
 
   .task-actions {
+    grid-column: 1 / -1;
     display: flex;
     flex-wrap: wrap;
     justify-content: flex-end;
