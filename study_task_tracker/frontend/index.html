@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>学习任务追踪器</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <section class="toolbar" aria-labelledby="app-title">
+        <div>
+          <p class="eyebrow">SDD Study Tracker</p>
+          <h1 id="app-title">学习任务追踪器</h1>
+          <div class="progress-block" aria-label="完成进度">
+            <div class="progress-text">
+              <span>完成率</span>
+              <strong id="completion-rate">0%</strong>
+            </div>
+            <div class="progress-track">
+              <div id="completion-bar" class="progress-bar"></div>
+            </div>
+          </div>
+        </div>
+        <div class="summary-grid" aria-label="任务摘要">
+          <div class="summary-item">
+            <span id="summary-total">0</span>
+            <small>全部</small>
+          </div>
+          <div class="summary-item">
+            <span id="summary-pending">0</span>
+            <small>待完成</small>
+          </div>
+          <div class="summary-item">
+            <span id="summary-done">0</span>
+            <small>已完成</small>
+          </div>
+          <div class="summary-item alert">
+            <span id="summary-overdue">0</span>
+            <small>逾期</small>
+          </div>
+        </div>
+      </section>
+
+      <section class="workspace">
+        <form id="task-form" class="panel form-panel">
+          <div class="form-title-row">
+            <h2 id="form-title">新增任务</h2>
+            <button id="cancel-edit" type="button" class="text-button hidden">取消编辑</button>
+          </div>
+          <input id="editing-id" name="editingId" type="hidden" />
+          <label>
+            <span>任务标题</span>
+            <input id="title" name="title" maxlength="80" required placeholder="例如：完成单元测试练习" />
+          </label>
+          <label>
+            <span>课程/主题</span>
+            <input id="course" name="course" maxlength="40" placeholder="软件工程" />
+          </label>
+          <div class="form-row">
+            <label>
+              <span>截止日期</span>
+              <input id="due-date" name="dueDate" type="date" required />
+            </label>
+            <label>
+              <span>优先级</span>
+              <select id="priority" name="priority">
+                <option value="medium">中</option>
+                <option value="high">高</option>
+                <option value="low">低</option>
+              </select>
+            </label>
+          </div>
+          <button id="submit-button" type="submit" class="primary-button">新增任务</button>
+          <p id="form-message" class="message" role="status"></p>
+        </form>
+
+        <section class="panel task-panel">
+          <div class="task-header">
+            <h2>任务列表</h2>
+            <div class="filter-stack">
+              <label class="search-box">
+                <span>搜索</span>
+                <input id="search" type="search" placeholder="标题、课程或 ID" />
+              </label>
+              <label class="compact-select">
+                <span>优先级</span>
+                <select id="priority-filter">
+                  <option value="">全部</option>
+                  <option value="high">高</option>
+                  <option value="medium">中</option>
+                  <option value="low">低</option>
+                </select>
+              </label>
+              <div class="segmented-control" aria-label="任务状态筛选">
+                <button type="button" class="filter active" data-status="">全部</button>
+                <button type="button" class="filter" data-status="pending">待完成</button>
+                <button type="button" class="filter" data-status="done">已完成</button>
+              </div>
+            </div>
+          </div>
+          <div id="task-list" class="task-list" aria-live="polite"></div>
+        </section>
+      </section>
+    </main>
+    <script src="/app.js"></script>
+  </body>
+</html>
